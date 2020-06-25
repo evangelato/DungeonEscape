@@ -8,10 +8,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _jumpForce = 5;
     [SerializeField]
-    private LayerMask _groundLayer;
-    [SerializeField]
-    private bool _grounded = false;
-    private bool resetJumpNeeded = false;
+    private float _speed = 2.5f;
+    private bool _resetJump = false;
+
     // Variable for jump force
     // Variable grounded is false using raycasting
     void Start()
@@ -22,49 +21,41 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Movement();
+    }
+
+    void Movement()
+    {
         float move = Input.GetAxisRaw("Horizontal");
 
-        // If space key and is grounded
-        float velocity = _rigid.velocity.y;
-        if (Input.GetKeyDown(KeyCode.Space) && _grounded)
+        _rigid.velocity = new Vector2(move * _speed, _rigid.velocity.y);
+
+        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
         {
             _rigid.velocity = new Vector2(_rigid.velocity.x, _jumpForce);
-            _grounded = false;
-            resetJumpNeeded = true;
-            StartCoroutine(ResetJumpNeededRoutine());
+            StartCoroutine(ResetJumpRoutine());
         }
+    }
 
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 0.7f, _groundLayer.value);
-        Debug.DrawRay(transform.position, Vector2.down * 0.7f, Color.green);
-        if (hit.collider != null)
+    bool IsGrounded()
+    {
+        RaycastHit2D hitInfo = Physics2D.Raycast(transform.position, Vector2.down, 0.7f, 1 << 8);
+        // Debug.DrawRay(transform.position, Vector2.down * 0.7f, Color.green);
+        if (hitInfo.collider != null)
         {
-            if (!resetJumpNeeded)
+            if (_resetJump == false)
             {
-                _grounded = true;
+                return true;
             }
-        }
 
-        _rigid.velocity = new Vector2(move, _rigid.velocity.y);
+        }
+        return false;
     }
 
-    IEnumerator ResetJumpNeededRoutine()
+    IEnumerator ResetJumpRoutine()
     {
+        _resetJump = true;
         yield return new WaitForSeconds(0.1f);
-        resetJumpNeeded = false;
+        _resetJump = false;
     }
-    /*
-    bool isGrounded()
-    {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 0.7f, _groundLayer.value);
-        Debug.DrawRay(transform.position, Vector2.down * 0.7f, Color.green);
-        if (hit.collider != null)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    */
 }
