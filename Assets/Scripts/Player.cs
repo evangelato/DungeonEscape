@@ -10,12 +10,14 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _speed = 2.5f;
     private bool _resetJump = false;
+    private PlayerAnimation _playerAnim;
+    private SpriteRenderer _playerSprite;
 
-    // Variable for jump force
-    // Variable grounded is false using raycasting
     void Start()
     {
         _rigid = GetComponent<Rigidbody2D>();
+        _playerAnim = GetComponent<PlayerAnimation>();
+        _playerSprite = GetComponentInChildren<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -28,13 +30,25 @@ public class Player : MonoBehaviour
     {
         float move = Input.GetAxisRaw("Horizontal");
 
-        _rigid.velocity = new Vector2(move * _speed, _rigid.velocity.y);
+        if (move < 0)
+        {
+            Flip(true);
+        }
+        else if (move > 0)
+        {
+            Flip(false);
+        }
+
 
         if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
         {
             _rigid.velocity = new Vector2(_rigid.velocity.x, _jumpForce);
             StartCoroutine(ResetJumpRoutine());
         }
+
+        _rigid.velocity = new Vector2(move * _speed, _rigid.velocity.y);
+
+        _playerAnim.Move(move);
     }
 
     bool IsGrounded()
@@ -50,6 +64,18 @@ public class Player : MonoBehaviour
 
         }
         return false;
+    }
+
+    void Flip(bool isLeft)
+    {
+        if (isLeft)
+        {
+            _playerSprite.flipX = true;
+        }
+        else
+        {
+            _playerSprite.flipX = false;
+        }
     }
 
     IEnumerator ResetJumpRoutine()
