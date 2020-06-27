@@ -25,6 +25,10 @@ public class Player : MonoBehaviour
     void Update()
     {
         Movement();
+        if (Input.GetKeyDown(KeyCode.Z) && IsGrounded())
+        {
+            Attack();
+        }
     }
 
     void Movement()
@@ -52,6 +56,11 @@ public class Player : MonoBehaviour
         _rigid.velocity = new Vector2(move * _speed, _rigid.velocity.y);
 
         _playerAnim.Move(move);
+    }
+
+    void Attack()
+    {
+        _playerAnim.Attack();
     }
 
     bool IsGrounded()

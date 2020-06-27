@@ -20,4 +20,10 @@ public class PlayerAnimation : MonoBehaviour
     {
         _anim.SetBool("Jumping", jumping);
     }
+
+    public void Attack()
+    {
+        _anim.SetTrigger("Attack");
+    }
+
 }
