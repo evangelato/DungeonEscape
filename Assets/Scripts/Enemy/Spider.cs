@@ -14,4 +14,9 @@ public class Spider : Enemy, IDamageable
     {
 
     }
+
+    public override void Movement()
+    {
+        // Sit still
+    }
 }
